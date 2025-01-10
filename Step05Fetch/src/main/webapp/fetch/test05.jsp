@@ -32,7 +32,7 @@
 			// fetch() 함수를 이용해서 post 방식 요청하면서 queryString 을 요청의 body에 전달하기
 			fetch(url,{
 				method:"POST",
-				headers:{"Content-Type":"application/x-www-form-urlencoded; charset=utf-8"}
+				headers:{"Content-Type":"application/x-www-form-urlencoded; charset=utf-8"},
 		 		body:queryString
 			})
 			.then(res=>res.json())
