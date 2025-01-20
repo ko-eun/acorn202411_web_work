@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>/jquery/ajax2.html</title>
+</head>
+<body>
+	<button id="getBtn">친구 목록 받아오기</button>
+	<h3>친구 목록</h3>
+	<ul id="list">
+		
+	</ul>
+	<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+	<script>	
+		$("#getBtn").click(()=>{
+			$.ajax({
+				url:"friends.jsp",
+				method:"get",
+				success:(res)=>{
+					console.log(res);
+					
+					for (let i=0; i<les.length; i++){
+						$("<li>").text(res[i]).appendTo("#list");
+					}
+				}
+			});
+		});
+	</script>
+</body>
+</html>
