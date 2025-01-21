@@ -23,14 +23,15 @@
 			<div class="mb-2">
 				<label class="form-label" for="pwd">비밀번호</label>
 				<input @input="onPwdInput"
-					:class="{'is-valid':!isPwdValid && isPwdDirty, 'is-invalid':isPwdValid}" 
+					:class="{'is-valid':isPwdValid, 'is-invalid':!isPwdValid && isPwdDirty }" 
 					v-model="pwd" class="form-control" type="password" name="pwd" id="pwd"/>
 				<small class="form-text">특수 문자를 하나 이상 조합하세요.</small>
 				<div class="invalid-feedback">비밀 번호를 확인 하세요</div>
 			</div>
 			<div class="mb-2">
 				<label class="form-label" for="pwd2">비밀번호 확인</label>
-				<input v-model="pwd2" class="form-control" type="password"  id="pwd2"/>
+				<input v-model="pwd2" 
+					@input="onPwdInput"		class="form-control" type="password"  id="pwd2"/>
 			</div>			
 			<div class="mb-2">
 				<label class="form-label" for="email">이메일</label>
@@ -58,29 +59,24 @@
 			},
 			methods:{
 				onPwdInput(){
-					this.isPwdDirty=true
-					//비밀번호를 검증할 정규표현식 객체
+					this.isPwdDirty=true;
+					//비밀 번호를 검증할 정규 표현식(특수문자 포함여부)
 					const reg_pwd=/[\W]/;
-					const checkPwd = ()=>{
-						//양쪽에 입력한 비밀번호를 읽어와서 (2줄 코딩)
-						let pwd=document.querySelector("#pwd").value;
-						let pwd2=document.querySelector("#pwd2").value;
-						
-						// 일단 정규 표현식을 만족하는지 확인해서 만족하지 않으면 함수를 여기서 종료(return) 해야한다.
-						// 만일 첫 번째 비밀번호가 정규 표현식을 통과하지 못 하거나 또는 
-						// 두 번째 비밀번호가 정규 표현식을 통과하지 못 한다면 isPwdValid 를 false 로 변경하고 checkForm() 호출
-						if(!reg_pwd.test(pwd) || !reg_pwd.test(pwd2)){
-							this.isPwdValid=false;
-							return;
-						}
-						
-						if(pwd == pwd2){
-							this.isPwdValid=true;
-						}else{
-							this.isPwdValid=false;
-						}
+					//일단 정규표현식을 만족하는지 확인해서 만족하지 않으면 함수를 여기서 종료
+					//만일 첫번째 비밀번호가 정규표현식을 통과하지 못하거나 또는 두번째 비밀번호가 정규표현식을 통과하지 못한다면
+					if( !reg_pwd.test(this.pwd) || !reg_pwd.test(this.pwd2) ){
+						this.isPwdValid=false;
+						return;
 					}
-				}
+					//위를 통과 했다면 여기서는 비밀번호가 같은지 여부를 알아내서 유효성 여부에 반영한다.
+					if(this.pwd == this.pwd2){
+						//비밀번호가 유효 하다는 의미에서 true 를 넣어준다.
+						this.isPwdValid=true;
+					}else{
+						//비밀번호가 유효 하지 않다는 의미에서 false 를 넣어준다.
+						this.isPwdValid=false;
+					}
+				},
 				onIdInput(e){
 					this.isIdDirty=true;
 					const reg_id=/^[a-z].{4,9}$/;
@@ -121,124 +117,6 @@
 				}
 			}
 		});
-		/*
-			//아이디 유효성 여부를 관리할 변수를 만들고 초기값 부여 
-			let isIdValid=false;
-			//비밀번호 유효성 여부를 관리할 변수를 만들고 초기값 부여
-			let isPwdValid=false;
-			//이메일 유효성 여부를 관리할 변수를 만들고 초기값 부여
-			let isEmailValid=false;
-			
-			const checkForm = ()=>{
-				//폼 전체의 유효성 여부에 따라 분기한다 (지금은 id 유효성 여부만)
-				if(isIdValid && isPwdValid && isEmailValid){
-					// type 속성이 submit 인 요소를 찾아서 disabled 속성을 제거한다.
-					document.querySelector("[type=submit]").removeAttribute("disabled");
-				}else{
-					// type 속성이 submit 인 요소를 찾아서 disabled="disabled" 속성을 추가한다.
-					document.querySelector("[type=submit]").setAttribute("disabled", "disabled");
-				}
-			};
-			
-			//아이디를 검증할 정규 표현식 
-			const reg_id=/^[a-z].{4,9}$/;
-			
-			// id 를 입력할때마다 실행할 함수 등록 
-			document.querySelector("#id").addEventListener("input", (event)=>{
-				//일단 is-valid, is-invalid 클래스를 모두 지우고 
-				event.target.classList.remove("is-valid", "is-invalid");
-				
-				//현재까지 입력한 아이디를 읽어온다.
-				let inputId=event.target.value;
-				//만일 정규표현식을 통과하지 못했다면 
-				if(!reg_id.test(inputId)){
-					
-						// 어떤 요소에 클래스를 추가하는 방법
-						// .classList.add("클래스명")
-				
-					event.target.classList.add("is-invalid");
-					//아이디의 상태값 변경
-					isIdValid=false;
-					// 아이디 상태값 변경이 버튼의 disabled 속성에 변화를 주도록 함수 호출
-					checkForm();
-					return;
-				}
-				// 제대로 통과했다면 서버에 입력한 아이디를 전송해서 사용 가능 여부를 응답받는다.
-				// fetch() 함수를 이용해서 get 방식으로 입력한 아이디를 보내고 사용가능 여부를 json 으로 응답
-				fetch("${pageContext.request.contextPath }/user/checkid.jsp?id="+inputId)
-				.then(res=>res.json())
-				.then(data=>{
-					// 일단 클래스를 제거한 후에 
-					event.target.classList.remove("is-valid", "is-invalid");
-					// 만일 사용할 수 있는 아이디라면
-					if(data.canUse){
-						event.target.classList.add("is-valid");
-						isIdValid=true;
-					}else{
-						event.target.classList.add("is-invalid");
-						isIdValid=false;
-					}
-					checkForm();
-				});
-			});
-			
-			//비밀번호를 검증할 정규표현식 객체
-			const reg_pwd=/[\W]/;
-			
-			//함수를 미리 만들어서
-			const checkPwd = ()=>{
-				//양쪽에 입력한 비밀번호를 읽어와서 (2줄 코딩)
-				let pwd=document.querySelector("#pwd").value;
-				let pwd2=document.querySelector("#pwd2").value;
-				
-				//일단 is-valid 와 is-invalid 클래스를 제거를 먼저하고 (1줄 코딩)
-				document.querySelector("#pwd").classList.remove("is-valid", "is-invalid");
-				
-				// 일단 정규 표현식을 만족하는지 확인해서 만족하지 않으면 함수를 여기서 종료(return) 해야한다.
-				// 만일 첫 번째 비밀번호가 정규 표현식을 통과하지 못 하거나 또는 
-				// 두 번째 비밀번호가 정규 표현식을 통과하지 못 한다면 isPwdValid 를 false 로 변경하고 checkForm() 호출
-				if(!reg_pwd.test(pwd) || !reg_pwd.test(pwd2)){
-					document.querySelector("#pwd").classList.add("is-invalid");
-					isPwdValid=false;
-					checkForm();
-					return;
-				}
-				
-				// 양쪽에 입력한 비밀번호가 같은지 확인해서 같으면 isPwdValid 를 true 
-				// 다르면 isPwdValid 를 false 로 변경하고 checkForm() 호출 
-				if(pwd == pwd2){
-					document.querySelector("#pwd").classList.add("is-valid");
-					// 비밀번호가 유효 하다는 의미에서 true 를 넣어준다.
-					isPwdValid=true;
-				}else{
-					document.querySelector("#pwd").classList.add("is-invalid");
-					// 비밀번호가 유효하지 않다는 의미에서 false 를 넣어준다.
-					isPwdValid=false;
-				}
-				checkForm();
-			};
-			
-			document.querySelector("#pwd").addEventListener("input", checkPwd);
-			document.querySelector("#pwd2").addEventListener("input", checkPwd);
-			
-			
-			const reg_email=/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/
-			
-			document.querySelector("#email").addEventListener("input", (event)=>{
-				const email = event.target.value;
-				
-				document.querySelector("#email").classList.remove("is-valid", "is-invalid");
-				
-				if(reg_email.test(email)){
-					event.target.classList.add("is-valid");
-					isEmailValid=true;
-				}else{
-					event.target.classList.add("is-invalid");
-					isEmailValid=false;
-				}
-				checkForm();
-			});
-		*/
 	</script>
 </body>
 </html>

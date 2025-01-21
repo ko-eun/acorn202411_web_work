@@ -1,5 +1,5 @@
 -- 가입된 회원정보를 저장할 테이블
-CREATE TABLE uesrs(
+CREATE TABLE users(
 	num NUMBER PRIMARY KEY,
 	userName VARCHAR2(100) UNIQUE,
 	password VARCHAR2(100) NOT NULL,
