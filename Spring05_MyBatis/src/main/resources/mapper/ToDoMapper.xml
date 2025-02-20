@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="todo">
+	<select id="getList" resultType="com.example.Spring05.dto.ToDoDto">
+		SELECT id, content, regdate
+		FROM todo
+		ORDER BY id ASC
+	</select>
+	
+	<select id="getData" parameterType="int" resultType="com.example.Spring05.dto.ToDoDto">
+		SELECT id, content, regdate
+		FROM todo
+		WHERE id=#{id}
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO todo
+		(id, content, regdate)
+		VALUES(todo_seq.NEXTVAL, #{content}, SYSDATE)
+	</insert>
+	
+		<update id="update" parameterType="com.example.Spring05.dto.ToDoDto">
+		UPDATE todo
+		SET content=#{content}, regdate=SYSDATE
+		WHERE id=#{id}
+	</update>
+	
+	<delete id="delete" parameterType="int">
+		DELETE FROM todo
+		WHERE id=#{id}
+	</delete>
+</mapper>

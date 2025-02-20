@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>/templates/todo/list.html</title>
+</head>
+<body>
+	<div class="container">
+		<h1>할 일 목록</h1>
+		<a th:href="@{/todo/new}">할 일 추가</a>
+		<table>
+			<thead>
+				<tr>
+					<th>아이디</th>
+					<th>할 일</th>
+					<th>날짜</th>
+					<th>수정</th>
+					<th>삭제</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="todo : ${list}">
+					<td th:text="${todo.id}"></td>
+					<td th:text="${todo.content}"></td>
+					<td th:text="${todo.regdate}"></td>
+					<td>
+						<a th:href="@{/todo/edit(id=${todo.id})}">수정</a>
+					</td>
+					<td>
+						<a href="@{/todo/delete(id=${todo.id})">삭제</a>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</body>
+</html>
